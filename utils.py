@@ -69,10 +69,10 @@ def envs_in_repo(repo_name):
 # def list_of_repos():
 #     return os.listdir(REPOS)
 
-def update_session_file(saved_session):
-    pickle_out = open("saved_session.pickle",'wb')
-    pickle.dump(saved_session, pickle_out)
-    pickle_out.close()
+# def update_session_file(saved_session):
+#     pickle_out = open("saved_session.pickle",'wb')
+#     pickle.dump(saved_session, pickle_out)
+#     pickle_out.close()
 
 def get_latest_version_number(path_to_env):
     list_of_versions = os.listdir(path_to_env)
