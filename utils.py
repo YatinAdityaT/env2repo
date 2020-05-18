@@ -4,14 +4,14 @@ import subprocess
 
 REPOS = 'repos'
 
-
 def init_local_repo(url):
     print('cloning :',url)
-    path = os.path.join(REPOS,get_repo_name_from_url(url))
+    repo =  get_repo_name_from_url(url)
+    path = os.path.join(REPOS,repo)
     subprocess.run(f'git clone {url} {path}',shell=True)
-    repo_name = url.split('/')[-1].split('.')[0]
+    print('cloned successfully!\n')
     assert os.path.exists(path)
-    return repo_name
+    return repo
 
 def get_repo_name_from_url(url):
     return url.split('/')[-1].split('.')[0]
@@ -20,7 +20,8 @@ def pull_remote():
     subprocess.run(f'git pull',shell=True)
 
 def get_envs():
-    output = subprocess.check_output('conda env list', universal_newlines=True,shell=True)
+    output = subprocess.check_output('conda env list',
+        universal_newlines=True,shell=True)
     envs = []
     lines = output.split('\n')
     lines = lines[2:]
@@ -30,7 +31,9 @@ def get_envs():
             envs.append(env)
     return envs
 
-def save_env(env,repo_name,path):
+def save_env(env,repo):
+    path = os.path.join(REPOS,repo)
+    print('path',path)
     path_to_env = os.path.join(path,env)
     if not os.path.exists(path_to_env):
         version = '0'
@@ -42,37 +45,32 @@ def save_env(env,repo_name,path):
     os.mkdir(path_to_env_version)
 
     file_path = os.path.join(path_to_env_version,env+'.yml')
-    subprocess.run(f"conda env export --name {env} > {file_path}",shell=True)
+    subprocess.run(f"conda env export --name {env} > {file_path}",
+        shell=True)
     assert os.path.exists(file_path)
 
-    file_path_from_history = os.path.join(path_to_env_version,env+'_from_history.yml')
-    subprocess.run(f"conda env export --from-history --name {env} > {file_path_from_history}",shell=True)
+    file_path_from_history = os.path.join(path_to_env_version,
+        env+'_from_history.yml')
+    subprocess.run(f"conda env export --from-history --name {env} > {file_path_from_history}",
+        shell=True)
     assert os.path.exists(file_path_from_history)
 
     if version == '0':
-        update_github(env,repo_name,path_to_env,"add new env")
+        update_github(env,repo,"add new env")
     else:
-        update_github(env,repo_name,path_to_env,"add version",version=version)
+        update_github(env,repo,"add version",version=version)
     return version
 
 def remove_env(env):
-    subprocess.run(f"conda remove --name {env} --all",shell=True)
+    subprocess.run(f"conda remove --name {env} --all --yes",shell=True)
     envs = get_envs()
     assert env not in envs
 
-def envs_in_repo(repo_name):
-    envs = os.listdir(os.path.join(REPOS,repo_name))
+def envs_in_repo(repo):
+    envs = os.listdir(os.path.join(REPOS,repo))
     if '.git' in envs:
         envs.remove('.git')
     return envs
-
-# def list_of_repos():
-#     return os.listdir(REPOS)
-
-# def update_session_file(saved_session):
-#     pickle_out = open("saved_session.pickle",'wb')
-#     pickle.dump(saved_session, pickle_out)
-#     pickle_out.close()
 
 def get_latest_version_number(path_to_env):
     list_of_versions = os.listdir(path_to_env)
@@ -83,14 +81,17 @@ def get_latest_version_number(path_to_env):
         return str(max(list(map(int,list_of_versions))) + 1)
 
 def save_env_temp(env):
-    subprocess.run(f"conda env export --name {env} > temp.yml",shell=True)
+    subprocess.run(f"conda env export --name {env} > temp.yml",
+        shell=True)
     assert os.path.exists('temp.yml')
 
     file_path_from_history = 'temp_from_history.yml'
-    subprocess.run(f"conda env export --from-history --name {env} > {file_path_from_history}",shell=True)
+    subprocess.run(f"conda env export --from-history --name {env} > {file_path_from_history}",
+        shell=True)
     assert os.path.exists(file_path_from_history)
 
-def check_prev_backup(path_to_env,env):
+def check_prev_backup(repo,env):
+    path_to_env = os.path.join(REPOS,repo,env)
     if not os.path.exists(path_to_env):
         return False
     latest_version = str(int(get_latest_version_number(path_to_env)) - 1)
@@ -104,13 +105,15 @@ def check_prev_backup(path_to_env,env):
             else:
                 return False
 
-def update_github(env,repo_name,path_to_env,action,version=None):
+def update_github(env,repo,action,version=None):
+    path_to_env = os.path.join(REPOS,repo,env)
     workingdir = os.getcwd()
-    os.chdir(os.path.join(REPOS,repo_name))
+    os.chdir(os.path.join(REPOS,repo))
     if action=="add version":
         path_to_env_version = os.path.join(env,version)
         subprocess.run(f"git add {path_to_env_version}",shell=True)
-        subprocess.run(f'git commit -m "add {env} version {version}"',shell=True)
+        subprocess.run(f'git commit -m "add {env} version {version}"',
+            shell=True)
         subprocess.run(f'git push',shell=True)
 
     elif action=="remove env backup":
@@ -125,3 +128,8 @@ def update_github(env,repo_name,path_to_env,action,version=None):
 
     os.chdir(workingdir)
 
+def update_local_repo(repo):
+    workingdir = os.getcwd()
+    os.chdir(os.path.join(REPOS,repo))
+    subprocess.run(f'git pull',shell=True)
+    os.chdir(workingdir)
