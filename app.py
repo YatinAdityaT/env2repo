@@ -8,7 +8,7 @@ from tkinter import ttk
 import tkinter.font as font
 from tkinter import filedialog 
 from tkinter import Checkbutton,Canvas
-from tkinter.messagebox import askyesno,askquestion,showinfo
+from tkinter.messagebox import askyesno,askquestion,showinfo,showerror
 
 REPOS = 'repos'
 
@@ -42,10 +42,13 @@ root.resizable(width=False, height=False)
 
 # <----------------functions------------------>
 def init_repo():
-	url_value = url.get()
-	repo_name = init_local_repo(url_value)
-	saved_session['repo_name'] = repo_name
-	update_session_file(saved_session)
+	url_name = url.get()
+	if url_name.split('/')[-1].split('.')[-1] == 'git':
+		repo_name = init_local_repo(url_name)
+		saved_session['repo_name'] = repo_name
+		update_session_file(saved_session)
+	else:
+		showerror("INVALID URL!","The url you have entered is invalid. Try again")
 
 # <----------------Notebook------------------>
 note = ttk.Notebook(root)
@@ -217,6 +220,7 @@ def check_file():
 	print('checking file')
 	if os.path.exists('saved_session.pickle'):
 		note.tab(2, state="normal")
+		flag = True
 	else:
 		root.after(10, check_file)
 
