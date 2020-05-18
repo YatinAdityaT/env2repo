@@ -1,15 +1,19 @@
 import os
 import pickle
+import webbrowser
 from utils import *
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import tkinter.font as font
+from tkinter import filedialog 
 from tkinter import Checkbutton,Canvas
 from tkinter.messagebox import askyesno,askquestion,showinfo
 
-if not os.path.exists('repos'):
-	os.mkdir('repos')
+REPOS = 'repos'
+
+if not os.path.exists(REPOS):
+	os.mkdir(REPOS)
 
 if os.path.exists('saved_session.pickle'):
 	pickle_in = open('saved_session.pickle',"rb")
@@ -19,6 +23,10 @@ else:
 	update_session_file(saved_session)
 
 root = Tk()
+
+root.wm_iconbitmap("icon.ico")
+root.title("env2repo")
+
 
 width_of_window = 650
 height_of_window = 480
@@ -30,6 +38,7 @@ x = (screen_width/2)-(width_of_window/2)
 y = (screen_height/2)-(height_of_window/2)
 
 root.geometry("%dx%d+%d+%d"%(width_of_window,height_of_window,x,y))
+root.resizable(width=False, height=False)
 
 # <----------------functions------------------>
 def init_repo():
@@ -52,9 +61,11 @@ note.pack(expand = 1, fill = "both")
 
 
 # <----------------Home------------------>
+## <--canvas_howe-->	
 canvas_home = Canvas(home,bg='#398FFF')
 canvas_home.pack(expand=True,fill=BOTH)
 
+## <--url-->	
 url = Entry(canvas_home,width=40)
 url['font']=font.Font(size=15)
 
@@ -67,20 +78,24 @@ enter_url_button.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 # <----------------tab1------------------>
 
+## <--canvas1-->	
 canvas_tab1 = Canvas(tab1,bg='#398FFF')
 canvas_tab1.pack(expand=True,fill=BOTH)
 
+## <--add envs-->	
 envs = get_envs()
 env_list = Listbox(canvas_tab1,width = 50,bg='#85144B',fg='white')
 env_list.pack(side=LEFT,fill=Y)
 env_list.config(border=2,relief=FLAT,font=("Courier", 9))
 for env in envs:
 	env_list.insert(END,"      "+env)
+
+## <--scrollbar-->	
 scroll = Scrollbar(canvas_tab1,orient=VERTICAL,command=env_list.yview)
 scroll.pack(side=LEFT,fill=Y)
-
 env_list['yscrollcommand'] = scroll.set
 
+## <--functions for buttons-->	
 def show_info_backup(env_name,version):
 	showinfo(title="Backedup successfully!", message=env_name+" backedup successfully to version"+version)
 
@@ -98,11 +113,11 @@ def get_env_name_from_selection():
 def check_backup():
 	print('saved_session["repo_name"]',saved_session['repo_name'])
 	env_name = get_env_name_from_selection()
-	path_to_env = os.path.join('repos',saved_session['repo_name'],env_name)
+	path_to_env = os.path.join(REPOS,saved_session['repo_name'],env_name)
 	if not os.path.exists(path_to_env):
 		answer = askyesno('Not backedup',env_name+" is not backedup. Do u wish to backup?")
 		if answer:
-			version = save_env(env_name,saved_session['repo_name'],os.path.join('repos',saved_session['repo_name']))
+			version = save_env(env_name,saved_session['repo_name'],os.path.join(REPOS,saved_session['repo_name']))
 			show_info_backup(env_name,version)
 	else:
 		backed_up = check_prev_backup(path_to_env,env_name)
@@ -111,12 +126,12 @@ def check_backup():
 		else:
 			answer = askyesno('Backedup outdated',env_name+" has changed since the last backup. Do u wish to backup again?")
 			if answer:
-				version = save_env(env_name,saved_session['repo_name'],os.path.join('repos',saved_session['repo_name']))
+				version = save_env(env_name,saved_session['repo_name'],os.path.join(REPOS,saved_session['repo_name']))
 				show_info_backup(env_name,version)
 
 def backup_env():
 	env_name = get_env_name_from_selection()
-	version = save_env(env_name,saved_session['repo_name'],os.path.join('repos',saved_session['repo_name']))
+	version = save_env(env_name,saved_session['repo_name'],os.path.join(REPOS,saved_session['repo_name']))
 	show_info_backup(env_name,version)
 	
 
@@ -128,14 +143,13 @@ def delete_env():
 		showinfo(title="Removed!", message=env_name+"is removed from ur local machine")
 		env_list.delete(env_list.curselection())
 	else:
-		showwarning()
 		answer = askquestion ("Env not backed up!!",env_name+"has not been backed up or has been modified afterwards, are you sure you want to remove it?",icon = 'warning')
 		if answer=="yes":
 			remove_env(env_name)
 			showinfo(title="Removed!", message=env_name+"is removed from ur local machine")
 			env_list.delete(env_list.curselection())
 
-
+## <--buttons-->	
 check = Button(canvas_tab1, text="Check if backedup",command=check_backup,relief=FLAT,padx=20,pady=10,fg='blue',bd=2)
 check.pack(side=TOP,pady=90)
 check['font']=font.Font(size=15)
@@ -151,44 +165,62 @@ delete.pack(side=TOP,pady=10)
 delete['font']=font.Font(size=15)
 
 
-# <----------------tab2------------------>
-# if 'repo_name' in saved_session.keys():
-# 	if not saved_session['repo_name'] == None:
-# 		note.tab(0, state="normal")
+#<----------------tab2------------------>
 
-# 		canvas = Canvas(tab2,bg='#398FFF')
-# 		canvas.pack(expand=True,fill=BOTH)
+## <--canvas2-->	
+canvas_tab2 = Canvas(tab2,bg='#398FFF')
+canvas_tab2.pack(expand=True,fill=BOTH)
 
-# 		envs = envs_in_repo(saved_session['repo_name'])
-# 		env_list = Listbox(canvas,width = 50,bg='#85144B',fg='white')
-# 		env_list.pack(side=LEFT,fill=Y)
-# 		env_list.config(border=2,relief=FLAT,font=("Courier", 9))
-# 		for env in envs:
-# 			env_list.insert(END,"      "+env)
-# 		scroll = Scrollbar(canvas,orient=VERTICAL,command=env_list.yview)
-# 		scroll.pack(side=LEFT,fill=Y)
+## <--add envs-->	
+envs = envs_in_repo(saved_session['repo_name'])
+env_list_tab2_tab2 = Listbox(canvas_tab2,width = 50,bg='#85144B',fg='white')
+env_list_tab2_tab2.pack(side=LEFT,fill=Y)
+env_list_tab2_tab2.config(border=2,relief=FLAT,font=("Courier", 9))
+for env in envs:
+	env_list_tab2_tab2.insert(END,"      "+env)
 
-# 		env_list['yscrollcommand'] = scroll.set
+## <--scrollbar-->	
+scroll = Scrollbar(canvas_tab2,orient=VERTICAL,command=env_list_tab2_tab2.yview)
+scroll.pack(side=LEFT,fill=Y)
+env_list_tab2_tab2['yscrollcommand'] = scroll.set
 
 
+## <--functions for buttons-->	
+def open_env(): 
+	env_name = get_env_name_from_selection()
+	filename = filedialog.askopenfilename(initialdir = os.path.join(REPOS,saved_session['repo_name'],env_name),title = env_name, filetypes = (("Yml files","*.yml*"),("all files","*.*"))) 
+	if not filename == '':
+		webbrowser.open('file://' + os.path.realpath(filename))
 
+def delete_backup_env():
+	env_name = get_env_name_from_selection()
+	answer = askquestion ("You sure about that?","\""+env_name+"\" will be permanently removed from your local and remote backups, are you sure you want to remove it?",icon = 'warning')
+	
+	if answer=="yes":
+		path_to_env = os.path.join(REPOS,saved_session['repo_name'],env_name)
+		update_github(env_name,saved_session['repo_name'],path_to_env,"remove env backup")
+		showinfo(title="Removed!", message=env_name+" is removed from your local and remote backup.")
+		env_list_tab2.delete(env_list_tab2.curselection())	
+
+## <--buttons-->	
+open_ = Button(canvas_tab2, text="Open",command=open_env,relief=FLAT,padx=20,pady=10,fg='blue',bd=2)
+open_.pack(side=TOP,pady=90)
+open_['font']=font.Font(size=15)
+
+delete_env = Button(canvas_tab2, text="Delete env", command=delete_backup_env,relief=FLAT,padx=20,pady=10,fg='blue',bd=2)
+delete_env.pack(side=TOP,pady=10)
+delete_env['font']=font.Font(size=15)
+
+
+#<----------------enable tab2------------------>
+def check_file():
+	print('checking file')
+	if os.path.exists('saved_session.pickle'):
+		note.tab(2, state="normal")
+	else:
+		root.after(10, check_file)
+
+root.after(10, check_file)
 
 if __name__ == "__main__":
 	root.mainloop()
-
-
-
-
-
-
-# canvas = Canvas(tab1 ,bg='green')#, width=200, height=400
-# scroll = Scrollbar(tab1, command=canvas.yview)
-# canvas.config(yscrollcommand=scroll.set, scrollregion=(0,0,100,1000))
-# canvas.pack(side=LEFT, fill=BOTH, expand=True)
-# scroll.pack(side=RIGHT, fill=Y)
-
-# frame = Frame(canvas, bg='red')
-# canvas.create_window(90, 450, window=frame)
-
-# frame2 = Frame(canvas,bg="red")
-# canvas.create_window(2000, 550, window=frame2)

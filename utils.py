@@ -2,11 +2,15 @@ import os
 import pickle
 import subprocess
 
+REPOS = 'repos'
+
+
 def init_local_repo(url):
     print('cloning :',url)
-    subprocess.run(f'git clone {url} repos/{get_repo_name_from_url(url)}',shell=True)
+    path = os.path.join(REPOS,get_repo_name_from_url(url))
+    subprocess.run(f'git clone {url} {path}',shell=True)
     repo_name = url.split('/')[-1].split('.')[0]
-    assert os.path.exists(os.path.join('repos',repo_name))
+    assert os.path.exists(path)
     return repo_name
 
 def get_repo_name_from_url(url):
@@ -57,10 +61,13 @@ def remove_env(env):
     assert env not in envs
 
 def envs_in_repo(repo_name):
-    return os.listdir(os.path.join('repos',repo_name))
+    envs = os.listdir(os.path.join(REPOS,repo_name))
+    if '.git' in envs:
+        envs.remove('.git')
+    return envs
 
-def list_of_repos():
-    return os.listdir('repos')
+# def list_of_repos():
+#     return os.listdir(REPOS)
 
 def update_session_file(saved_session):
     pickle_out = open("saved_session.pickle",'wb')
@@ -99,7 +106,7 @@ def check_prev_backup(path_to_env,env):
 
 def update_github(env,repo_name,path_to_env,action,version=None):
     workingdir = os.getcwd()
-    os.chdir(os.path.join('repos',repo_name))
+    os.chdir(os.path.join(REPOS,repo_name))
     if action=="add version":
         path_to_env_version = os.path.join(env,version)
         subprocess.run(f"git add {path_to_env_version}",shell=True)
@@ -107,8 +114,8 @@ def update_github(env,repo_name,path_to_env,action,version=None):
         subprocess.run(f'git push',shell=True)
 
     elif action=="remove env backup":
-        subprocess.run(f"git add {env}",shell=True)
-        subprocess.run(f'git commit -m "removed {env}"',shell=True)
+        subprocess.run(f"git rm -r {env}",shell=True)
+        subprocess.run(f'git commit -m "remove {env}"',shell=True)
         subprocess.run(f'git push',shell=True)
 
     elif action=="add new env":
@@ -117,3 +124,4 @@ def update_github(env,repo_name,path_to_env,action,version=None):
         subprocess.run(f'git push',shell=True)
 
     os.chdir(workingdir)
+
