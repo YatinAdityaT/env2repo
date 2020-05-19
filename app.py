@@ -17,6 +17,7 @@ if not os.path.exists(REPOS):
 root = Tk()
 url,repo = StringVar(root),StringVar(root) 
 
+flag = False
 
 if os.path.exists("url.txt"):
 	flag = True # for disabling home
@@ -58,6 +59,7 @@ note = ttk.Notebook(root)
 home = ttk.Frame(note)
 tab1 = ttk.Frame(note)
 tab2 = ttk.Frame(note)
+about = ttk.Frame(note)
 
 if flag:
 	note.add(home,text="Add Github url",state="disabled")
@@ -66,6 +68,7 @@ else:
 
 note.add(tab1, text = "Your envs")
 note.add(tab2, text = "Envs on Github", state="disabled")
+note.add(about, text = "About")
 
 note.pack(expand = 1, fill = "both")
 
@@ -233,7 +236,7 @@ delete_env = Button(canvas_tab2, text="Delete env",
 delete_env.pack(side=TOP,pady=10)
 delete_env['font']=font.Font(size=15)
 
-#<----------------enable tab1 tab2------------------>
+#<----------------enable tab1 & tab2's buttons------------------>
 def check_file():
 	print('checking file')
 	if os.path.exists("url.txt"):
@@ -251,6 +254,17 @@ def check_file():
 		root.after(1, check_file)
 
 root.after(1, check_file)
+
+#<----------------About Page------------------>
+
+## <--canvas3-->	
+canvas_tab3 = Canvas(about,bg='#398FFF')
+canvas_tab3.pack(expand=True,fill=BOTH)
+
+with open("LICENSE.txt") as f:
+    LICENSE = f.read()
+license = Label(canvas_tab3,text = LICENSE)
+license.place(relx=.5, rely=.5, anchor="center")
 
 if __name__ == "__main__":
 	root.mainloop()
