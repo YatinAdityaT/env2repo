@@ -1,7 +1,7 @@
 # env2repo
 
 <p align="center">
-  <img src="https://github.com/YatinAdityaT/env2repo/assets/blob/master/icon.png" width="200"> 
+  <img src="https://github.com/YatinAdityaT/env2repo/blob/master/assets/icon.png" width="200"> 
 </p>
 :grin: A TKinter GUI that help you backup your environments to GitHub/delete them and much more.
 
@@ -19,7 +19,7 @@ So in a true developer fashion I made this GUI in a couple of days instead :swea
 
 ## Demo:
 <p align="center">
-  <img src="https://github.com/YatinAdityaT/env2repo/assets/blob/master/env2repo.gif" width="900">
+  <img src="https://github.com/YatinAdityaT/env2repo/blob/master/assets/env2repo.gif" width="900">
 </p>
 
 
