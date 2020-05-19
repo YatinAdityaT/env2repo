@@ -6,6 +6,9 @@
 :grin: A TKinter GUI that help you backup your environments to GitHub/delete them and much more.
 
 ## Motivation:
+<p align="center">
+  <img src="https://github.com/YatinAdityaT/env2repo/blob/master/docs/100gb.png" width="300" > 
+</p>
 Creating conda envs is a good habit. It help in keeping project dependencies separate and makes our lives a lot easier by helping us avoid dependency conflicts. But these envs hog up a lot of space. And if you are one of those unlucky people who naively installed Anaconda on their "C" drives (like me) then you will be aware of that feeling of dread when any software tries to install something on that drive (even though you specified it to use the "D" drive :frowning_face:) which is already choked up with the 10 envs you don't use anymore but can't let go.
 
 I have an embracing amount of envs on my system. Manually backing up each one to GitHub and then deleting them is super tedious and boring and would take hours.
@@ -19,7 +22,7 @@ So in a true developer fashion I made this GUI in a couple of days instead :swea
 
 ## Demo:
 <p align="center">
-  <img src="https://github.com/YatinAdityaT/env2repo/blob/master/assets/env2repo.gif" width="900">
+  <img src="https://github.com/YatinAdityaT/env2repo/blob/master/docs/env2repo.gif" width="900">
 </p>
 
 
