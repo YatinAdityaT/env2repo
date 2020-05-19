@@ -29,7 +29,7 @@ def get_envs():
         env = line.split(' ')[0]
         if not env == '':
             envs.append(env)
-    return envs
+    return sorted(envs, key=str.lower)
 
 def save_env(env,repo):
     path = os.path.join(REPOS,repo)
@@ -70,7 +70,7 @@ def envs_in_repo(repo):
     envs = os.listdir(os.path.join(REPOS,repo))
     if '.git' in envs:
         envs.remove('.git')
-    return envs
+    return sorted(envs, key=str.lower)
 
 def get_latest_version_number(path_to_env):
     list_of_versions = os.listdir(path_to_env)

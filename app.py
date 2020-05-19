@@ -10,7 +10,7 @@ from tkinter import filedialog,Checkbutton,Canvas
 from tkinter.messagebox import askyesno,askquestion,showinfo,showerror
 
 REPOS = 'repos'
-
+FONT = ("Courier", 10)
 if not os.path.exists(REPOS):
 	os.mkdir(REPOS)
 
@@ -96,9 +96,9 @@ canvas_tab1.pack(expand=True,fill=BOTH)
 
 ## <--add envs-->	
 envs = get_envs()
-env_list = Listbox(canvas_tab1,width = 50,bg='#85144B',fg='white')
+env_list = Listbox(canvas_tab1,width = 40,bg='#85144B',fg='white',activestyle='none')
 env_list.pack(side=LEFT,fill=Y)
-env_list.config(border=2,relief=FLAT,font=("Courier", 9))
+env_list.config(border=2,relief=FLAT,font=FONT)
 for env in envs:
 	env_list.insert(END,"      "+env)
 
@@ -134,13 +134,17 @@ def check_backup():
 			answer = askyesno('Backedup outdated',
 				env_name+" has changed since the last backup. Do u wish to backup again?")
 			if answer:
-				version = save_env(env_name,repo,get())
+				version = save_env(env_name,repo.get())
 				show_info_backup(env_name,version)
+
+	root.after(1,add_envs())
+
 
 def backup_env():
 	env_name = get_env_name_from_selection()
 	version = save_env(env_name,repo.get())
 	show_info_backup(env_name,version)
+	root.after(1,add_envs())
 	
 
 def delete_env():
@@ -158,6 +162,7 @@ def delete_env():
 			remove_env(env_name)
 			showinfo(title="Removed!", message=env_name+" is removed from ur local machine")
 			env_list.delete(env_list.curselection())
+	root.after(1,add_envs())
 
 ## <--buttons-->	
 check = Button(canvas_tab1, text="Check if backedup",
@@ -192,14 +197,17 @@ def get_env_name_from_selection_tab2():
 	return env_name
 
 ## <--add envs-->	
-env_list_tab2 = Listbox(canvas_tab2,width = 50,bg='#85144B',fg='white')
+env_list_tab2 = Listbox(canvas_tab2,width = 40,bg='#85144B',fg='white',activestyle='none')
 env_list_tab2.pack(side=LEFT,fill=Y)
-env_list_tab2.config(border=2,relief=FLAT,font=("Courier", 9))
+env_list_tab2.config(border=2,relief=FLAT,font=FONT)
 
-envs = envs_in_repo(repo.get())
-print(envs)
-for env in envs:
-	env_list_tab2.insert(END,"      "+env)
+def add_envs():
+	env_list_tab2.delete(0, END)
+	envs = envs_in_repo(repo.get())
+	for env in envs:
+		env_list_tab2.insert(END,"      "+env)
+
+add_envs()
 
 ## <--scrollbar-->	
 scroll = Scrollbar(canvas_tab2,orient=VERTICAL,command=env_list_tab2.yview)
