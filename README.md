@@ -45,6 +45,9 @@ So in a true developer fashion I made this GUI in a couple of days instead :swea
 ## Caution:
 - Read the warning/alert messages carefully if you don't want to lose your envs.
 
+## Known issues:
+- GUI hangs and shows "Not responding" when git is working in the background.
+
 ## How to contribute:
 
 ### Directly
