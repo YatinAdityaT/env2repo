@@ -42,6 +42,9 @@ So in a true developer fashion I made this GUI in a couple of days instead :swea
 - Inside these version folders you should see two .yml files. One is created by running ```conda env export --name {env} > temp.yml``` and the other by running ```conda env export --from-history --name {env} > {file_path_from_history}```.
 - **"Delete env" in the "Envs on GitHub" tab deletes entire env backup from GitHub. But doesn't affect the env locally**
 
+
+- **To install from yml file**: Use the command: `conda env create -f environment.yml` as specified [here](https://github.com/conda/conda/issues/3417#issuecomment-247109058) or `conda env update --file environment.yaml --name dropSeqPipe` as specified [here](https://github.com/conda/conda/issues/6827#issuecomment-365562719) intead of `conda install --file` as shown [here](https://github.com/conda/conda/issues/6827#issuecomment-365614464).
+
 ## Caution:
 - Read the warning/alert messages carefully if you don't want to lose your envs.
 
